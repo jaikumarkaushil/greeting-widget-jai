@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Bebas+Neue" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Greeting Dashboard</title>
+  <style>
+    body {
+      background-color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .full-table {
+      display: table;
+      height: 100vh;
+      width: 100%;
+    }
+
+    .table-cell {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: center;
+    }
+
+    .card {
+      position: relative;
+      width: 90vw;
+      max-width: 700px;
+      padding: 60px 30px;
+      border-radius: 20px;
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+      transition: background-image 1s ease-in-out, opacity 0.8s ease-in-out;
+      opacity: 0;
+      overflow: hidden;
+    }
+
+    .card.visible {
+      opacity: 1;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6));
+      z-index: 1;
+      animation: fadeOverlay 60s ease-in-out infinite alternate;
+    }
+
+    @keyframes fadeOverlay {
+      0%   { background: linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.55)); }
+      25%   { background: linear-gradient(135deg, rgba(0,0,0,0.55), rgba(0,0,0,0.65)); }
+      50%  { background: linear-gradient(135deg, rgba(0,0,0,0.65), rgba(0,0,0,0.75)); }
+      75%  { background: linear-gradient(135deg, rgba(0,0,0,0.55), rgba(0,0,0,0.65)); }
+      100% { background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6)); }
+    }
+
+    .greet, .date, .clock {
+      z-index: 2;
+      text-align: center;
+    }
+
+    .greet {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.8rem;
+      margin-bottom: 20px;
+    }
+
+    .date {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+    }
+
+    .clock {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 3rem;
+      letter-spacing: 2px;
+    }
+
+    @media (max-width: 500px) {
+      .greet { font-size: 2.2rem; }
+      .date { font-size: 1.8rem; }
+      .clock { font-size: 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="full-table">
+  <div class="table-cell">
+    <div class="card" id="card">
+      <div class="greet" id="greet"></div>
+      <div class="date" id="date"></div>
+      <div class="clock">
+        <span id="hour"></span>
+        <span>:</span>
+        <span id="min"></span>
+        <span>:</span>
+        <span id="sec"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const backgroundImages = {
+    morning: "https://images.unsplash.com/photo-1690382198667-3115e17ac6a5?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    afternoon: "https://images.unsplash.com/photo-1585924015977-32fd3839c21f?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    evening: "https://images.unsplash.com/photo-1679596315544-481e739dbf18?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    night: "https://images.unsplash.com/photo-1479267658415-ff274a213280?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  };
+  function updateDateTime() {
+    const today = new Date();
+    const hrs = today.getHours();
+    const mins = zeros(today.getMinutes());
+    const secs = zeros(today.getSeconds());
+    const session = hrs >= 12 ? 'PM' : 'AM';
+    const displayHour = zeros((hrs % 12 === 0) ? 12 : hrs % 12);
+
+    document.getElementById('date').innerHTML = today.toDateString();
+    document.getElementById('hour').innerHTML = displayHour;
+    document.getElementById('min').innerHTML = mins;
+    document.getElementById('sec').innerHTML = zeros(secs) + ' ' + session;
+
+    const greetEl = document.getElementById('greet');
+    const cardEl = document.getElementById('card');
+
+    let greeting = '';
+    let bgImage = '';
+
+    if (hrs >= 5 && hrs < 12) {
+      greeting = "Good Morning";
+      bgImage = `url('${backgroundImages.morning}')`;
+    } else if (hrs >= 12 && hrs < 17) {
+      greeting = "Good Afternoon";
+      bgImage = `url('${backgroundImages.afternoon}')`;
+    } else if (hrs >= 17 && hrs < 22) {
+      greeting = "Good Evening";
+      bgImage = `url('${backgroundImages.evening}')`;
+    } else {
+      greeting = "Good Night";
+      bgImage = `url('${backgroundImages.night}')`;
+    }
+
+    greetEl.innerHTML = greeting;
+    cardEl.style.backgroundImage = bgImage;
+    cardEl.classList.add('visible');
+
+    setTimeout(updateDateTime, 1000);
+  }
+
+  function zeros(num) {
+    return (num < 10 ? '0' : '') + num;
+  }
+
+  updateDateTime();
+</script>
+
+</body>
+</html>
